@@ -1,0 +1,5 @@
+time,embeddings,dimensions,data,subset,model
+936.1367428302765,21779,1024,ecalls,CEO,bge-large-en-v1.5
+439.9059464931488,21779,1024,ecalls,CEO,bge-large-en-v1.5
+424.0478940010071,21779,1024,ecalls,CEO,bge-large-en-v1.5
+408.04708671569824,21779,1024,ecalls,CEO,bge-large-en-v1.5
