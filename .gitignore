@@ -3,7 +3,26 @@
 
 # Virtual environment
 .venv
-requirements.txt
+
+# pycache
+**/__pycache__/
 
 # Misc
 poetry_cmds.txt
+**/query.py
+cultural_attribute_synonyms.py
+bge_test.ipynb
+main.ipynb
+
+# Data
+**/data/
+
+# Logs
+**/log/log.jsonl*
+
+# Alembic
+alembic.ini
+alembic/
+
+# todo list
+TODO.md
