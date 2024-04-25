@@ -3,6 +3,7 @@ from sentence_transformers import SentenceTransformer
 from datetime import timedelta
 from time import process_time
 
+from log import setup_logging
 from database import get_all_reviews, update_reviews_scores
 from utils import (
     get_average_embedding,
@@ -81,20 +82,24 @@ def main():
     risk_averse_average = get_average_embedding(risk_averse_embeddings)
     risk_taking_average = get_average_embedding(risk_taking_embeddings)
 
-    # Start the multi-process pool on all available CUDA devices
-    pool = model.start_multi_process_pool()
+    try:
 
-    start_time = process_time()
+        # Start the multi-process pool on all available CUDA devices
+        pool = model.start_multi_process_pool()
 
-    # Generate embeddings for all reviews
-    review_embeddings = model.encode_multi_process(
-        reviews_dict.values(), pool
-    )  # normalize_embeddings=True
+        start_time = process_time()
 
-    end_time = process_time()
+        # Generate embeddings for all reviews
+        review_embeddings = model.encode_multi_process(
+            reviews_dict.values(), pool
+        )  # normalize_embeddings=True
 
-    # Optional: Stop the processes in the pool
-    model.stop_multi_process_pool(pool)
+        end_time = process_time()
+
+    finally:
+
+        # Optional: Stop the processes in the pool
+        model.stop_multi_process_pool(pool)
 
     # Print run time
     elapsed_time = timedelta(seconds=(end_time - start_time))
@@ -128,4 +133,11 @@ def main():
 
 
 if __name__ == "__main__":
+
+    # Setup logging
+    listener = setup_logging()
+
     main()
+
+    # Stop listener
+    listener.stop()
