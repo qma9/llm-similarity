@@ -29,7 +29,7 @@
     },
     "file_json": {
       "class": "logging.handlers.RotatingFileHandler",
-      "level": "DEBUG",
+      "level": "INFO",
       "formatter": "json",
       "filename": "log.jsonl",
       "maxBytes": 104857600,
@@ -41,7 +41,7 @@
   },
   "loggers": {
     "root": {
-      "level": "WARNING",
+      "level": "DEBUG",
       "handlers": ["queue_handler", "stderr", "file_json"]
     }
   }

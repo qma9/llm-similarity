@@ -1,5 +1,4 @@
 from dask.dataframe import DataFrame as DaskDataFrame
-from sqlalchemy.engine import Row
 from pandas import DataFrame
 from numpy import dot, array, sum
 from numpy.linalg import norm

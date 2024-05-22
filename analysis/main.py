@@ -1,9 +1,9 @@
 from sentence_transformers import SentenceTransformer
 
 from datetime import timedelta
-from time import process_time
+from time import perf_counter
 
-from log import setup_logging
+from log import setup_logging, logger
 from database import get_all_reviews, update_reviews_scores
 from utils import (
     get_average_embedding,
@@ -29,18 +29,20 @@ from config import (
 
 
 def main():
+    total_start_time = perf_counter  # Benchmark total runtime
 
+    # Get all reviews from SQLite database
     reviews = get_all_reviews()
-
-    print(f"\nTotal reviews: {len(reviews)}\n")
+    logger.info(f"Total reviews: {len(reviews)}", extra={"total_reviews": len(reviews)})
 
     # Create a dictionary with review_id as the key and review_text as the value
     reviews_dict = {review.review_id: review.review_text for review in reviews}
 
     # Import model
     model = SentenceTransformer(MODEL_PATH)
+    logger.info(f"Loaded model from {MODEL_PATH}.")
 
-    # Generate embeddings for both extremes of the structural aspects
+    # Generate embeddings for both extremes of structural aspects
     centralized_embeddings = model.encode(
         CENTRALIZED_REVIEWS, normalize_embeddings=True
     )
@@ -67,6 +69,7 @@ def main():
     risk_taking_embeddings = model.encode(
         RISK_TAKING_REVIEWS, normalize_embeddings=True
     )
+    logger.info("Encoded extreme reviews.")
 
     # Get average embeddings for attribute extremes
     centralized_average = get_average_embedding(centralized_embeddings)
@@ -81,29 +84,31 @@ def main():
     innovative_average = get_average_embedding(innovative_embeddings)
     risk_averse_average = get_average_embedding(risk_averse_embeddings)
     risk_taking_average = get_average_embedding(risk_taking_embeddings)
+    logger.info("Calculated average embeddings for extremes.")
 
     try:
 
         # Start the multi-process pool on all available CUDA devices
         pool = model.start_multi_process_pool()
 
-        start_time = process_time()
+        model_start_time = perf_counter()  # Benchmark model runtime
 
         # Generate embeddings for all reviews
-        review_embeddings = model.encode_multi_process(
-            reviews_dict.values(), pool
-        )  # normalize_embeddings=True
+        review_embeddings = model.encode_multi_process(reviews_dict.values(), pool)
 
-        end_time = process_time()
+        model_end_time = perf_counter()  # Benchmark model runtime
 
     finally:
 
         # Optional: Stop the processes in the pool
         model.stop_multi_process_pool(pool)
 
-    # Print run time
-    elapsed_time = timedelta(seconds=(end_time - start_time))
-    print(f"\n{MODEL} model ran in: {elapsed_time}\n")
+    # Log model runtime
+    model_time = timedelta(seconds=(model_end_time - model_start_time))
+    logger.info(
+        f"{MODEL} model ran in: {model_time}",
+        extra={"model": MODEL, "time": model_time},
+    )
 
     # Get similarity scores for review embeddings
     similarity_scores_dict = get_similarity_scores(
@@ -130,6 +135,12 @@ def main():
 
     # Update reviews with similarity scores
     update_reviews_scores(reviews, similarity_scores_dict)
+
+    total_end_time = perf_counter  # Benchmark total runtime
+
+    # Log total runtime
+    total_time = timedelta(seconds=(total_end_time - total_start_time))
+    logger.info(f"Total runtime: {total_time}", extra={"total_time": total_time})
 
 
 if __name__ == "__main__":
