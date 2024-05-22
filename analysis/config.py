@@ -1,29 +1,7 @@
-# Data config
-DATA: str = (
-    "/media/ssdraid/quentinmowat-amiet/Dropbox (IESE)/earnings_calls/Originals/Conference Calls/OLD/ccalls_from_stata.csv"  # CCALLS_copy.csv
-)
-DTYPE: dict = {
-    "gvkey": "int",
-    "new_text": "object",
-}  # {'job': str, 'year': int, 'quarter': str, 'text': str, 'conm': str, 'gvkey': float}, was throwing error
-JOB: str = "CEO"
-
 # Model config
-MODEL_FAMILY: str = "bge"
-MODEL: str = f"{MODEL_FAMILY}-large-en-v1.5"
-MODEL_PATH: str = f"BAAI/{MODEL}"
-
-# Export config
-# PROMPT: str = 'continuous'
-EXPORT_TYPE: str = "ecalls"
-EXPORT_FILE: str = f"{EXPORT_TYPE}_{MODEL_FAMILY}_{JOB}_test.csv"
-EXPORT_PATH: str = (
-    f"/media/ssdraid/quentinmowat-amiet/Dropbox (IESE)/earnings_calls/outputs/"
-)
-EXPORT_DATA: str = f"{EXPORT_PATH}{EXPORT_FILE}"
-
-EXPORT_PNG: str = "histograms_of_scores0.png"
-EXPORT_FIGURE: str = f"{EXPORT_PATH}{EXPORT_PNG}"
+MODEL_FAMILY = "bge"
+MODEL = f"{MODEL_FAMILY}-large-en-v1.5"
+MODEL_PATH = f"BAAI/{MODEL}"
 
 # Cultural/Structural attributes of interest
 POSITIVE_ATTRIBUTES = [
